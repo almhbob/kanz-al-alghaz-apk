@@ -42,8 +42,17 @@ jobs:
       # refuses to build if ANDROID_HOME and ANDROID_SDK_ROOT disagree).
       - name: Ensure required Android SDK packages are installed
         run: |
-          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -maxdepth 2 -name sdkmanager | sort | tail -n1)"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          SDK_BASE="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "SDK_BASE=$SDK_BASE"
+          find "$SDK_BASE" -maxdepth 3 2>/dev/null || echo "SDK_BASE does not exist"
+          SDKMANAGER="$(find "$SDK_BASE" -maxdepth 4 -type f -name sdkmanager 2>/dev/null | sort | tail -n1)"
           echo "using sdkmanager at: $SDKMANAGER"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "::error::sdkmanager not found anywhere under $SDK_BASE"
+            exit 1
+          fi
           yes | "$SDKMANAGER" --licenses || true
           "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
