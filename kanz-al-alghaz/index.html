@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>كنز الألغاز — لعبة الذكاء العربية</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0B1026">
+<meta name="description" content="كنز الألغاز — ٣٥ لغزًا عربيًا عبر سبع ممالك: حروف، أرقام، صور، بازل، وكلمة سر مخبأة.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0B1026;
+  --night2:#121A38;
+  --card:#182248;
+  --gold:#D4AF37;
+  --gold-bright:#F0C75E;
+  --teal:#3AA6A0;
+  --ivory:#F5EFE0;
+  --muted:#8B93B5;
+  --danger:#E05B5B;
+  --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--night);
+  color:var(--ivory);
+  overflow:hidden;
+  user-select:none;
+}
+.ico{width:20px;height:20px;flex-shrink:0;color:inherit}
+.ico-sm{width:14px;height:14px;vertical-align:-2px}
+
+/* خلفية النقوش الهندسية */
+.pattern-bg{
+  position:fixed;inset:0;z-index:0;opacity:.06;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23D4AF37' stroke-width='1'%3E%3Cpath d='M60 10 L95 35 L95 85 L60 110 L25 85 L25 35 Z'/%3E%3Cpath d='M60 30 L60 90 M35 45 L85 75 M85 45 L35 75'/%3E%3Ccircle cx='60' cy='60' r='12'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:120px 120px;
+}
+.glow{
+  position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(90px);
+}
+.glow-1{width:420px;height:420px;background:rgba(212,175,55,.10);top:-140px;left:-120px}
+.glow-2{width:380px;height:380px;background:rgba(58,166,160,.09);bottom:-120px;right:-100px}
+
+.app{position:relative;z-index:1;height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:20px;animation:fadeIn .45s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ====== الشاشة الرئيسية ====== */
+.home{justify-content:center;align-items:center;text-align:center;gap:8px}
+.home-top{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.streak-chip{display:flex;align-items:center;gap:6px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.32);
+  color:var(--gold-bright);border-radius:100px;padding:7px 14px;font-size:13px;font-weight:700}
+.streak-chip .ico{width:17px;height:17px;color:#F0935E}
+.star-emblem{width:150px;height:150px;margin-bottom:6px;animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.game-title{font-family:'Amiri',serif;font-size:52px;font-weight:700;line-height:1.15;
+  background:linear-gradient(180deg,var(--gold-bright),var(--gold) 60%,#9c7d22);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 40px rgba(212,175,55,.25)}
+.game-sub{color:var(--muted);font-size:16px;letter-spacing:.5px;margin-bottom:26px}
+.btn{
+  font-family:'Tajawal';font-weight:700;font-size:18px;border:none;cursor:pointer;
+  border-radius:var(--radius);padding:16px 24px;transition:transform .15s ease,box-shadow .15s ease;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:active{transform:scale(.96)}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#241c05;
+  box-shadow:0 8px 28px rgba(212,175,55,.35),inset 0 1px 0 rgba(255,255,255,.5);
+  width:100%;max-width:300px;font-size:20px;
+}
+.btn-ghost{background:rgba(245,239,224,.07);color:var(--ivory);border:1px solid rgba(245,239,224,.15);width:100%;max-width:300px}
+.btn-danger{background:rgba(224,91,91,.14);border:1px solid rgba(224,91,91,.4);color:#ff9d9d;width:100%}
+.home-stats{display:flex;gap:10px;margin-top:28px;width:100%;max-width:320px}
+.stat-card{flex:1;background:var(--card);border:1px solid rgba(212,175,55,.18);border-radius:14px;padding:12px 4px;text-align:center}
+.stat-card .ico{color:var(--gold-bright);margin-bottom:4px}
+.stat-card b{display:block;font-size:18px;color:var(--gold-bright);font-weight:900}
+.stat-card span{font-size:10.5px;color:var(--muted)}
+
+/* ====== الرأس المشترك ====== */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid rgba(212,175,55,.25);
+  border-radius:100px;padding:7px 14px;font-weight:700;font-size:15px}
+.chip .ico{width:17px;height:17px}
+.icon-btn{width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid rgba(245,239,224,.14);
+  color:var(--ivory);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn:active{transform:scale(.92)}
+
+/* زخرفة الزوايا */
+.card-ornament{position:absolute;width:28px;height:28px;color:var(--gold);opacity:.4;pointer-events:none}
+.card-ornament.tl{top:8px;left:8px}
+.card-ornament.tr{top:8px;right:8px;transform:scaleX(-1)}
+
+/* ====== خريطة المراحل ====== */
+.map-head{text-align:center;margin:4px 0 16px}
+.map-head h2{font-family:'Amiri',serif;font-size:30px;color:var(--gold-bright)}
+.map-head p{color:var(--muted);font-size:14px;margin-top:3px}
+.progress-track{height:8px;background:rgba(245,239,224,.08);border-radius:10px;margin:14px 4px 20px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:10px;transition:width .6s ease;box-shadow:0 0 12px rgba(212,175,55,.5)}
+.levels-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-y:auto;padding:4px 2px 30px;flex:1}
+.chapter-header{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:14px 0 2px;font-family:'Amiri',serif;font-size:16px;font-weight:700}
+.chapter-header:first-child{margin-top:0}
+.chapter-header .ico{width:18px;height:18px}
+.chapter-header::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,currentColor,transparent);opacity:.7}
+.level-node{
+  aspect-ratio:1;border-radius:16px;background:var(--card);border:1px solid rgba(212,175,55,.2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;transition:transform .15s;position:relative;font-weight:900;font-size:19px;
+}
+.level-node:active{transform:scale(.93)}
+.level-node.locked{opacity:.38;pointer-events:none;border-color:rgba(245,239,224,.08)}
+.level-node.locked .ico{color:var(--muted)}
+.level-node.current{border:2px solid var(--pulse,var(--gold-bright));box-shadow:0 0 18px var(--pulse-glow,rgba(212,175,55,.4));animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px var(--pulse-glow,rgba(212,175,55,.3))}50%{box-shadow:0 0 22px var(--pulse-glow,rgba(212,175,55,.6))}}
+.level-node .mini-stars{font-size:9px;letter-spacing:1px;color:var(--gold-bright)}
+.level-node .mini-stars .off{color:rgba(245,239,224,.18)}
+.type-dot{position:absolute;top:6px;left:6px;width:7px;height:7px;border-radius:50%}
+
+/* ====== شاشة اللعب ====== */
+.hud{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.level-label{font-family:'Amiri',serif;font-size:21px;color:var(--gold-bright);display:flex;align-items:center;gap:5px}
+.timer{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700;font-size:15px}
+.puzzle-card{
+  background:linear-gradient(160deg,var(--card),var(--night2));
+  border:1px solid rgba(212,175,55,.28);border-radius:22px;
+  padding:26px 20px;text-align:center;margin:10px 0 18px;
+  box-shadow:0 14px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(245,239,224,.06);
+  position:relative;overflow:hidden;
+}
+.puzzle-card::before{
+  content:"";position:absolute;top:0;right:0;left:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--accent,var(--gold)),transparent);
+}
+.puzzle-type-tag{display:inline-block;font-size:12px;font-weight:700;color:var(--teal);
+  border:1px solid rgba(58,166,160,.4);border-radius:100px;padding:3px 12px;margin-bottom:12px}
+.puzzle-question{font-family:'Amiri',serif;font-size:26px;line-height:1.7;font-weight:700}
+.puzzle-illus{width:132px;height:132px;margin:14px auto 0;position:relative;display:flex;align-items:center;justify-content:center}
+.puzzle-illus::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.18),transparent 70%)}
+.puzzle-illus::after{content:"";position:absolute;inset:8px;border:1px dashed rgba(212,175,55,.3);border-radius:50%}
+.puzzle-illus svg{width:96px;height:96px;position:relative;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
+.game-area{flex:1;display:flex;flex-direction:column;overflow-y:auto}
+
+/* خانات الإجابة */
+.answer-slots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:22px;direction:rtl}
+.slot{
+  width:48px;height:54px;border-radius:12px;background:rgba(245,239,224,.05);
+  border:2px dashed rgba(212,175,55,.35);display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;cursor:pointer;transition:all .15s;font-family:'Amiri',serif;
+}
+.slot.filled{border-style:solid;border-color:var(--gold);background:rgba(212,175,55,.12);color:var(--gold-bright)}
+.slot.hinted{border-color:var(--teal);background:rgba(58,166,160,.14);color:var(--teal);pointer-events:none}
+.answer-slots.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* حروف متناثرة */
+.letter-pool{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;direction:rtl}
+.letter{
+  width:52px;height:56px;border-radius:14px;font-family:'Amiri',serif;
+  background:linear-gradient(180deg,#212c58,var(--card));border:1px solid rgba(212,175,55,.3);
+  color:var(--ivory);font-size:27px;font-weight:900;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.35);transition:transform .1s,opacity .2s;
+}
+.letter:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.letter.used{opacity:0;pointer-events:none;transform:scale(.5)}
+
+/* خيارات متعددة */
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{
+  padding:20px 12px;border-radius:16px;background:var(--card);border:1px solid rgba(212,175,55,.25);
+  color:var(--ivory);font-family:'Tajawal';font-size:19px;font-weight:700;cursor:pointer;transition:all .15s;
+}
+.opt:active{transform:scale(.96)}
+.opt.correct{background:rgba(58,166,160,.22);border-color:var(--teal);color:#7ee6df}
+.opt.wrong{background:rgba(224,91,91,.16);border-color:var(--danger);color:#ff9d9d;animation:shake .4s}
+.opt.removed{opacity:.25;pointer-events:none}
+
+.game-actions{display:flex;gap:10px;margin-top:18px;padding-bottom:8px}
+.btn-hint{flex:1;background:rgba(58,166,160,.14);border:1px solid rgba(58,166,160,.45);color:#7ee6df}
+.btn-clear{flex:1;background:rgba(224,91,91,.1);border:1px solid rgba(224,91,91,.35);color:#ff9d9d}
+
+/* تلميح أول استخدام */
+.tip-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(58,166,160,.12);border:1px solid rgba(58,166,160,.4);border-radius:14px;
+  padding:10px 14px;margin-bottom:10px;font-size:12.5px;color:#bfe9e4;line-height:1.5}
+.tip-dismiss{background:var(--teal);color:#04211f;border:none;border-radius:100px;
+  padding:7px 16px;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0;font-family:'Tajawal'}
+
+/* بازل الصورة */
+.jigsaw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:198px;height:198px;
+  margin:6px auto 0;border-radius:14px;overflow:hidden;border:2px solid rgba(212,175,55,.35);
+  padding:4px;background:rgba(0,0,0,.2)}
+.jigsaw-grid.shake{animation:shake .45s}
+.jigsaw-tile{border:none;border-radius:6px;background-color:var(--night2);background-size:300% 300%;cursor:pointer;
+  transition:transform .15s,box-shadow .15s;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.jigsaw-tile:active{transform:scale(.94)}
+.jigsaw-tile.selected{box-shadow:0 0 0 3px var(--gold-bright),inset 0 0 0 1px rgba(0,0,0,.25)}
+
+/* كلمة السر المخبأة */
+.ws-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:300px;margin:4px auto 0;direction:rtl}
+.ws-grid.shake{animation:shake .45s}
+.ws-cell{aspect-ratio:1;border-radius:8px;background:rgba(245,239,224,.05);border:1px solid rgba(212,175,55,.25);
+  color:var(--ivory);font-family:'Amiri',serif;font-size:16px;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ws-cell.selected{background:rgba(212,175,55,.22);border-color:var(--gold);color:var(--gold-bright)}
+.ws-cell.hinted{background:rgba(58,166,160,.22);border-color:var(--teal);color:var(--teal)}
+
+/* ====== شاشة الإعدادات ====== */
+.setting-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);
+  border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:16px 18px;margin-bottom:12px}
+.setting-row span{font-weight:700;font-size:15px;display:flex;align-items:center;gap:9px}
+.setting-row .ico{color:var(--teal)}
+.switch{position:relative;width:50px;height:28px;background:rgba(245,239,224,.14);border-radius:100px;
+  cursor:pointer;transition:background .2s;flex-shrink:0}
+.switch.on{background:linear-gradient(135deg,var(--gold-bright),var(--gold))}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;background:#fff;
+  border-radius:50%;transition:transform .2s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.switch.on::after{transform:translateX(-22px)}
+
+/* ====== شاشة الإنجازات ====== */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;padding:4px 2px 30px}
+.ach-card{background:var(--card);border:1px solid rgba(212,175,55,.22);border-radius:16px;padding:16px 12px;
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .2s}
+.ach-card.locked{opacity:.5}
+.ach-icon-badge{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ach-icon-badge .ico{width:24px;height:24px}
+.ach-name{font-weight:700;font-size:14px}
+.ach-desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ====== نافذة الفوز ====== */
+.modal-veil{position:fixed;inset:0;background:rgba(5,8,20,.75);backdrop-filter:blur(6px);
+  z-index:50;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-veil.show{display:flex;animation:fadeIn .3s}
+.win-card{
+  width:100%;max-width:360px;background:linear-gradient(165deg,#1c2750,var(--night2));
+  border:1px solid rgba(212,175,55,.45);border-radius:26px;padding:34px 26px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);animation:popIn .45s cubic-bezier(.2,1.4,.4,1);
+  position:relative;overflow:hidden;
+}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.win-title{font-family:'Amiri',serif;font-size:34px;color:var(--gold-bright);margin-bottom:4px}
+.win-answer{color:var(--muted);font-size:15px;margin-bottom:16px}
+.win-answer b{color:var(--ivory)}
+.win-best{color:var(--teal);font-size:13px;margin-bottom:10px}
+.win-stars{font-size:42px;letter-spacing:8px;margin:8px 0 4px}
+.win-stars span{display:inline-block;color:rgba(245,239,224,.15)}
+.win-stars span.on{color:var(--gold-bright);text-shadow:0 0 18px rgba(212,175,55,.7);animation:starPop .4s backwards}
+.win-stars span.on:nth-child(1){animation-delay:.15s}
+.win-stars span.on:nth-child(2){animation-delay:.4s}
+.win-stars span.on:nth-child(3){animation-delay:.65s}
+@keyframes starPop{from{transform:scale(0) rotate(-60deg)}to{transform:scale(1) rotate(0)}}
+.win-coins{color:var(--gold-bright);font-weight:900;font-size:17px;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:6px}
+.win-btns{display:flex;flex-direction:column;gap:10px}
+.link-btn{background:none;border:none;color:var(--muted);font-family:'Tajawal';font-size:13px;font-weight:700;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;gap:6px}
+.link-btn:active{opacity:.6}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+
+.toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--card);border:1px solid rgba(212,175,55,.4);color:var(--ivory);
+  padding:12px 22px;border-radius:100px;font-weight:700;font-size:15px;z-index:70;
+  transition:transform .35s cubic-bezier(.2,1.2,.4,1);box-shadow:0 10px 30px rgba(0,0,0,.4);white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.ach-toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);
+  background:linear-gradient(135deg,#241c05,#3a2c0a);border:1px solid var(--gold);color:var(--gold-bright);
+  padding:12px 20px;border-radius:16px;font-weight:700;font-size:14px;z-index:80;
+  display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,.5);
+  transition:transform .4s cubic-bezier(.2,1.2,.4,1);max-width:88%;
+}
+.ach-toast.show{transform:translateX(-50%) translateY(0)}
+.ach-toast-icon{width:26px;height:26px;flex-shrink:0}
+.ach-toast-sub{font-size:10px;color:var(--muted);font-weight:500}
+
+@media (max-width:380px){
+  .slot{width:40px;height:47px;font-size:22px}
+  .letter{width:45px;height:50px;font-size:23px}
+  .game-title{font-size:42px}
+  .puzzle-question{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- مكتبة الأيقونات والرسومات -->
+<svg style="display:none" aria-hidden="true">
+<defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 4 6v14l5-2 6 2 5-2V4l-5 2-6-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 13v3M9 20h6M9.5 20c0-2 .8-3 2.5-3s2.5 1 2.5 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17h6M10 20h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.45 1 .95 1.1 1.6h4.8c.1-.65.5-1.15 1.1-1.6A6 6 0 0 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M5 8v5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.3 13A7 7 0 1 0 7 7.2L5 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" opacity=".15"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5v9M9.3 9.3c0-1 1-1.6 2.7-1.6s2.7.6 2.7 1.5c0 2-5.4 1-5.4 3 0 1 1 1.6 2.7 1.6s2.7-.6 2.7-1.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 10v4h3l5 4V6l-5 4H4Z" fill="currentColor"/><path d="M16 9.5a4 4 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 10v4h3l5 4V6l-5 4H4Z" fill="currentColor"/><path d="m16 9 5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 9v6M20 9v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r=".9" fill="currentColor"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="6" r="2.3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="18" r="2.3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11l8-4M8 13l8 4" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 3-2 4-2 7a3 3 0 1 0 6 1c1.5 1 2 3 2 4.5A6.5 6.5 0 0 1 5 15c0-4 2-5 3-7.5C9 5 10 3 12 2Z" fill="currentColor"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="M4 18h16l-1.5-8L14 13l-2-6-2 6-4.5-3L4 18Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 12 20 2M16 6l3 3M13 9l2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-brain" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-1 5.8A3 3 0 0 0 8 17a3 3 0 0 0 4-1V6a2.5 2.5 0 0 0-3-2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 1 5.8A3 3 0 0 1 16 17a3 3 0 0 1-4-1V6a2.5 2.5 0 0 1 3-2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+<symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m15 9-2 5-5 2 2-5 5-2Z" fill="currentColor"/></symbol>
+<symbol id="i-letter" viewBox="0 0 24 24"><path d="M5 18V6l7 7 7-7v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="m5 17 5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-hash" viewBox="0 0 24 24"><path d="M9 4 7 20M17 4l-2 16M4 9h16M3 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-gem" viewBox="0 0 24 24"><path d="M6 9 9 4h6l3 5-8 11L6 9Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 9h12M9 4l3 5 3-5M12 9l-3 11M12 9l3 11" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+<symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M5 8h4V6.5a1.8 1.8 0 1 1 3.6 0V8H16v3.5a1.8 1.8 0 1 0 0 3.6V19H5v-4a1.8 1.8 0 1 0 0-3.6V8Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+<symbol id="i-star-badge" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6L21 9.5l-4.5 4 1.3 6.4L12 16.9l-5.8 3 1.3-6.4L3 9.5l6.4-.9L12 3Z" fill="currentColor"/></symbol>
+<symbol id="i-ornament" viewBox="0 0 60 60"><path d="M4 30 L30 4 M30 4 L56 30" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".8"/><path d="M16 30 L30 16 L44 30" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="30" cy="30" r="5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 30h8M48 30h8" stroke="currentColor" stroke-width="1.2"/></symbol>
+
+<!-- رسومات الألغاز المصورة -->
+<symbol id="art-watermelon" viewBox="0 0 120 120">
+ <circle cx="60" cy="60" r="52" fill="#2F855A"/>
+ <circle cx="60" cy="60" r="52" fill="none" stroke="#1F6B45" stroke-width="3"/>
+ <circle cx="60" cy="60" r="44" fill="#F5EFE0"/>
+ <circle cx="60" cy="60" r="38" fill="#E0524A"/>
+ <g fill="#241c05">
+  <ellipse cx="45" cy="48" rx="3" ry="5" transform="rotate(-20 45 48)"/>
+  <ellipse cx="70" cy="45" rx="3" ry="5" transform="rotate(15 70 45)"/>
+  <ellipse cx="60" cy="70" rx="3" ry="5" transform="rotate(5 60 70)"/>
+  <ellipse cx="40" cy="72" rx="3" ry="5" transform="rotate(-30 40 72)"/>
+  <ellipse cx="78" cy="66" rx="3" ry="5" transform="rotate(25 78 66)"/>
+ </g>
+</symbol>
+<symbol id="art-camel" viewBox="0 0 120 120">
+ <ellipse cx="60" cy="100" rx="38" ry="4" fill="#000" opacity=".25"/>
+ <rect x="12" y="82" width="6" height="20" rx="3" fill="#B9873F"/>
+ <rect x="26" y="82" width="6" height="20" rx="3" fill="#B9873F"/>
+ <rect x="82" y="82" width="6" height="20" rx="3" fill="#B9873F"/>
+ <rect x="96" y="82" width="6" height="20" rx="3" fill="#B9873F"/>
+ <rect x="10" y="62" width="94" height="30" rx="15" fill="#D9A65C"/>
+ <circle cx="38" cy="58" r="18" fill="#D9A65C"/>
+ <circle cx="66" cy="54" r="20" fill="#D9A65C"/>
+ <path d="M84 62 L102 40 L100 66 Z" fill="#D9A65C"/>
+ <circle cx="100" cy="46" r="9" fill="#D9A65C"/>
+ <path d="M104 40 L112 36 L106 46 Z" fill="#D9A65C"/>
+ <path d="M14 72 Q6 76 10 84" fill="none" stroke="#B9873F" stroke-width="3" stroke-linecap="round"/>
+ <circle cx="97" cy="44" r="2" fill="#3a2c0a"/>
+</symbol>
+<symbol id="art-mosque" viewBox="0 0 120 120">
+ <rect x="16" y="70" width="88" height="34" fill="#121A38"/>
+ <rect x="16" y="70" width="88" height="34" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".5"/>
+ <rect x="8" y="30" width="14" height="42" rx="2" fill="#182248" stroke="#D4AF37" stroke-width="1.5"/>
+ <circle cx="15" cy="26" r="9" fill="none" stroke="#D4AF37" stroke-width="2"/>
+ <rect x="98" y="30" width="14" height="42" rx="2" fill="#182248" stroke="#D4AF37" stroke-width="1.5"/>
+ <circle cx="105" cy="26" r="9" fill="none" stroke="#D4AF37" stroke-width="2"/>
+ <path d="M32 70 V44 A28 28 0 0 1 88 44 V70 Z" fill="#182248" stroke="#D4AF37" stroke-width="2"/>
+ <circle cx="60" cy="30" r="6" fill="none" stroke="#F0C75E" stroke-width="2"/>
+ <path d="M55 12 a6 6 0 1 0 8 8 a8 8 0 1 1 -8 -8" fill="#F0C75E"/>
+ <path d="M60 70 a12 14 0 0 1 24 0 Z" fill="#0B1026"/>
+ <path d="M15 17 v18M105 17v18" stroke="#D4AF37" stroke-width="2"/>
+</symbol>
+<symbol id="art-honey" viewBox="0 0 120 120">
+ <path d="M42 50 L78 50 L84 96 A10 10 0 0 1 74 106 H46 A10 10 0 0 1 36 96 Z" fill="#E0A82E"/>
+ <path d="M42 50 L78 50 L84 96 A10 10 0 0 1 74 106 H46 A10 10 0 0 1 36 96 Z" fill="none" stroke="#9c7d22" stroke-width="2"/>
+ <rect x="46" y="38" width="28" height="14" rx="3" fill="#B9873F" stroke="#7a5a22" stroke-width="1.5"/>
+ <path d="M50 62 Q60 70 70 62 Q60 80 50 62" fill="#F0C75E" opacity=".7"/>
+ <path d="M60 92 q4 10 0 16 q-4 -6 0 -16" fill="#F0C75E"/>
+ <g transform="translate(94 66)">
+   <ellipse cx="0" cy="0" rx="10" ry="7" fill="#241c05"/>
+   <path d="M-9 -1 h18 M-8 3 h16" stroke="#F0C75E" stroke-width="2"/>
+   <circle cx="9" cy="-1" r="3" fill="#241c05"/>
+   <ellipse cx="-2" cy="-8" rx="6" ry="3.4" fill="#F5EFE0" opacity=".85" transform="rotate(-20 -2 -8)"/>
+   <ellipse cx="4" cy="-9" rx="6" ry="3.4" fill="#F5EFE0" opacity=".85" transform="rotate(10 4 -9)"/>
+   <path d="M9 -4 l4 -3M9 -1 l5 0" stroke="#241c05" stroke-width="1.3" stroke-linecap="round"/>
+ </g>
+</symbol>
+<symbol id="art-umbrella" viewBox="0 0 120 120">
+ <path d="M20 55 A40 40 0 0 1 100 55 Q94 49 88 55 Q82 49 76 55 Q70 49 64 55 Q58 49 52 55 Q46 49 40 55 Q34 49 28 55 Q22 49 20 55Z" fill="#3AA6A0"/>
+ <path d="M20 55 A40 40 0 0 1 100 55" fill="none" stroke="#2c7d78" stroke-width="2"/>
+ <line x1="60" y1="55" x2="60" y2="98" stroke="#D4AF37" stroke-width="3" stroke-linecap="round"/>
+ <path d="M60 98 q0 8 8 8" fill="none" stroke="#D4AF37" stroke-width="3" stroke-linecap="round"/>
+ <circle cx="60" cy="52" r="3" fill="#F0C75E"/>
+ <g fill="#8ecfe0">
+  <ellipse cx="30" cy="78" rx="3" ry="5.5" transform="rotate(10 30 78)"/>
+  <ellipse cx="90" cy="80" rx="3" ry="5.5" transform="rotate(-8 90 80)"/>
+  <ellipse cx="42" cy="100" rx="3" ry="5.5" transform="rotate(6 42 100)"/>
+  <ellipse cx="14" cy="95" rx="3" ry="5.5" transform="rotate(-12 14 95)"/>
+ </g>
+</symbol>
+</defs>
+</svg>
+
+<div class="pattern-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<canvas id="confetti"></canvas>
+
+<div class="app">
+
+  <!-- الرئيسية -->
+  <div class="screen home active" id="scr-home">
+    <div class="home-top">
+      <button class="icon-btn" onclick="goAchievements()" aria-label="الإنجازات"><svg class="ico"><use href="#i-trophy"/></svg></button>
+      <div class="streak-chip" id="streak-chip" style="display:none"><svg class="ico"><use href="#i-flame"/></svg><span id="streak-count">0</span> أيام متتالية</div>
+      <button class="icon-btn" onclick="goSettings()" aria-label="الإعدادات"><svg class="ico"><use href="#i-gear"/></svg></button>
+    </div>
+    <svg class="star-emblem" viewBox="0 0 200 200" aria-hidden="true">
+      <defs>
+        <linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F0C75E"/><stop offset="1" stop-color="#9c7d22"/>
+        </linearGradient>
+      </defs>
+      <g id="emblem-segs" transform="translate(100,100)"></g>
+      <circle cx="100" cy="100" r="26" fill="none" stroke="url(#gg)" stroke-width="2.5"/>
+      <text x="100" y="112" text-anchor="middle" font-family="Amiri" font-size="30" font-weight="700" fill="url(#gg)">؟</text>
+    </svg>
+    <h1 class="game-title">كنز الألغاز</h1>
+    <p class="game-sub">خمسة وثلاثون لغزًا عبر سبع ممالك تنتظر عقلًا لامعًا</p>
+    <button class="btn btn-gold" onclick="goMap()">ابدأ المغامرة</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="continueGame()">متابعة آخر مرحلة</button>
+    <div class="home-stats">
+      <div class="stat-card"><svg class="ico"><use href="#i-puzzle"/></svg><b id="hs-solved">0</b><span>لغز محلول</span></div>
+      <div class="stat-card"><svg class="ico"><use href="#i-star-badge"/></svg><b id="hs-stars">0</b><span>نجمة</span></div>
+      <div class="stat-card"><svg class="ico"><use href="#i-coin"/></svg><b id="hs-coins">0</b><span>عملة</span></div>
+    </div>
+  </div>
+
+  <!-- خريطة المراحل -->
+  <div class="screen" id="scr-map">
+    <div class="topbar">
+      <button class="icon-btn" onclick="showScreen('scr-home')" aria-label="رجوع"><svg class="ico"><use href="#i-home"/></svg></button>
+      <div class="chip"><svg class="ico" style="color:var(--gold-bright)"><use href="#i-coin"/></svg><span id="map-coins">0</span></div>
+    </div>
+    <div class="map-head">
+      <h2>خريطة الكنز</h2>
+      <p id="map-progress-text">أكملت 0 من 30 مرحلة</p>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="levels-grid" id="levels-grid"></div>
+  </div>
+
+  <!-- اللعب -->
+  <div class="screen" id="scr-game">
+    <div class="topbar">
+      <button class="icon-btn" onclick="goMap()" aria-label="الخريطة"><svg class="ico"><use href="#i-map"/></svg></button>
+      <div class="hud" style="flex:1;margin:0 12px">
+        <span class="level-label"><svg class="ico" id="g-chapter-icon"><use href="#i-letter"/></svg><span id="g-level">المرحلة 1</span></span>
+        <span class="timer" id="g-timer">00:00</span>
+      </div>
+      <div class="chip"><svg class="ico" style="color:var(--gold-bright)"><use href="#i-coin"/></svg><span id="g-coins">0</span></div>
+    </div>
+
+    <div class="game-area">
+      <div class="tip-banner" id="tip-banner" style="display:none">
+        <span id="tip-text"></span>
+        <button class="tip-dismiss" onclick="dismissTip()">فهمت</button>
+      </div>
+      <div class="puzzle-card">
+        <svg class="card-ornament tl"><use href="#i-ornament"/></svg>
+        <svg class="card-ornament tr"><use href="#i-ornament"/></svg>
+        <span class="puzzle-type-tag" id="g-type"></span>
+        <div class="puzzle-question" id="g-question"></div>
+        <div class="puzzle-illus" id="g-emoji" style="display:none"></div>
+      </div>
+
+      <div class="answer-slots" id="g-slots" style="display:none"></div>
+      <div class="letter-pool" id="g-pool" style="display:none"></div>
+      <div class="options" id="g-options" style="display:none"></div>
+      <div class="jigsaw-grid" id="g-jigsaw" style="display:none"></div>
+      <div class="ws-grid" id="g-ws" style="display:none"></div>
+
+      <div class="game-actions">
+        <button class="btn btn-hint" id="btn-hint" onclick="useHint()"><svg class="ico"><use href="#i-bulb"/></svg> تلميح (20)</button>
+        <button class="btn btn-clear" id="btn-clear" onclick="clearSlots()"><svg class="ico"><use href="#i-undo"/></svg> مسح</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- الإعدادات -->
+  <div class="screen" id="scr-settings">
+    <div class="topbar">
+      <button class="icon-btn" onclick="showScreen('scr-home')" aria-label="رجوع"><svg class="ico"><use href="#i-home"/></svg></button>
+      <div class="chip"><svg class="ico"><use href="#i-gear"/></svg> الإعدادات</div>
+    </div>
+    <div style="margin-top:8px">
+      <div class="setting-row"><span><svg class="ico" id="ico-sound-row"><use href="#i-sound"/></svg> المؤثرات الصوتية</span><div class="switch" id="sw-sound" onclick="toggleSetting('sound')"></div></div>
+      <div class="setting-row"><span><svg class="ico"><use href="#i-vibrate"/></svg> الاهتزاز اللمسي</span><div class="switch" id="sw-haptics" onclick="toggleSetting('haptics')"></div></div>
+    </div>
+    <div style="margin-top:auto;padding-bottom:6px">
+      <button class="btn btn-danger" onclick="resetProgress()">إعادة ضبط التقدم بالكامل</button>
+    </div>
+  </div>
+
+  <!-- الإنجازات -->
+  <div class="screen" id="scr-achievements">
+    <div class="topbar">
+      <button class="icon-btn" onclick="showScreen('scr-home')" aria-label="رجوع"><svg class="ico"><use href="#i-home"/></svg></button>
+      <div class="chip"><svg class="ico" style="color:var(--gold-bright)"><use href="#i-trophy"/></svg><span id="ach-progress">0/10</span></div>
+    </div>
+    <div class="ach-grid" id="ach-grid"></div>
+  </div>
+</div>
+
+<!-- نافذة الفوز -->
+<div class="modal-veil" id="win-modal">
+  <div class="win-card">
+    <svg class="card-ornament tl"><use href="#i-ornament"/></svg>
+    <svg class="card-ornament tr"><use href="#i-ornament"/></svg>
+    <div class="win-title" id="win-title">أحسنت!</div>
+    <div class="win-answer">الإجابة: <b id="win-answer"></b></div>
+    <div class="win-best" id="win-best" style="display:none"></div>
+    <div class="win-stars" id="win-stars"><span>★</span><span>★</span><span>★</span></div>
+    <div class="win-coins"><svg class="ico"><use href="#i-coin"/></svg><span id="win-coins">+10 عملة</span></div>
+    <div class="win-btns">
+      <button class="btn btn-gold" id="btn-next" onclick="nextLevel()">اللغز التالي ←</button>
+      <button class="btn btn-ghost" onclick="closeWin();goMap()">خريطة الكنز</button>
+      <button class="link-btn" onclick="copyResult()"><svg class="ico ico-sm"><use href="#i-share"/></svg> نسخ / مشاركة النتيجة</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="ach-toast" id="ach-toast">
+  <svg class="ico ach-toast-icon" id="ach-toast-ico"><use href="#i-trophy"/></svg>
+  <div><div class="ach-toast-sub">إنجاز جديد</div><div id="ach-toast-text"></div></div>
+</div>
+
+<script>
+/* ============ بنك الألغاز ============ */
+/* type: tiles = حروف | seq = متتالية | emoji = لغز مصوّر | mcq = اختيار */
+const PUZZLES=[
+ {type:'tiles',q:'له أسنانٌ كثيرة ولا يعضّ أبدًا، فما هو؟',a:'مشط',hint:'تستخدمه لشعرك كل صباح'},
+ {type:'seq',q:'ما الرقم التالي؟',seq:'٢ ، ٤ ، ٦ ، ٨ ، ؟',a:'10',opts:['9','10','12','14']},
+ {type:'emoji',q:'ما الكلمة التي تصفها الصورة؟',art:'watermelon',a:'بطيخ',hint:'فاكهة صيفية حمراء من الداخل'},
+ {type:'mcq',q:'أيّ كلمة لا تنتمي للمجموعة؟',opts:['تفاح','موز','خيار','برتقال'],a:'خيار',why:'الخيار من الخضروات'},
+ {type:'tiles',q:'يكتب طوال يومه ولا يقرأ حرفًا واحدًا؟',a:'قلم',hint:'تمسكه بيدك عند الكتابة'},
+ {type:'mcq',q:'كم شهرًا في السنة فيه ٢٨ يومًا؟',opts:['شهر واحد','شهران','جميع الشهور','ولا شهر'],a:'جميع الشهور',why:'كل شهر يحتوي ٢٨ يومًا على الأقل'},
+ {type:'emoji',q:'ما الكلمة التي تصفها الصورة؟',art:'camel',a:'جمل',hint:'سفينة الصحراء'},
+ {type:'seq',q:'ما الرقم التالي؟',seq:'١ ، ٣ ، ٥ ، ٧ ، ؟',a:'9',opts:['8','9','10','11']},
+ {type:'tiles',q:'كلما زاد نقص، فما هو؟',a:'عمر',hint:'يُقاس بالسنوات'},
+ {type:'mcq',q:'أيّ كلمة لا تنتمي للمجموعة؟',opts:['أسد','نمر','ذئب','صقر'],a:'صقر',why:'الصقر طائر والبقية حيوانات برية'},
+ {type:'emoji',q:'ما المكان الذي تصفه الصورة؟',art:'mosque',a:'مسجد',hint:'بيت من بيوت الله'},
+ {type:'tiles',q:'يسمعك بلا أذن ويكلّمك بلا لسان؟',a:'هاتف',hint:'في جيبك الآن غالبًا'},
+ {type:'seq',q:'ما الرقم التالي؟',seq:'٢ ، ٤ ، ٨ ، ١٦ ، ؟',a:'32',opts:['24','30','32','36']},
+ {type:'mcq',q:'أيهما أثقل: كيلو حديد أم كيلو قطن؟',opts:['كيلو الحديد','كيلو القطن','متساويان','لا يمكن المقارنة'],a:'متساويان',why:'الكيلو كيلو مهما اختلفت المادة'},
+ {type:'tiles',q:'تمشي بلا أرجل ولا تتوقف عقاربها عن الدوران؟',a:'ساعة',hint:'تخبرك بالوقت'},
+ {type:'mcq',q:'أيّ كلمة لا تنتمي للمجموعة؟',opts:['أحمر','أزرق','دائرة','أصفر'],a:'دائرة',why:'الدائرة شكل هندسي والبقية ألوان'},
+ {type:'emoji',q:'ما الكلمة التي تصفها الصورة؟',art:'honey',a:'عسل',hint:'فيه شفاء للناس'},
+ {type:'seq',q:'ما الرقم التالي؟ (متتالية شهيرة)',seq:'١ ، ١ ، ٢ ، ٣ ، ٥ ، ٨ ، ؟',a:'13',opts:['11','12','13','15']},
+ {type:'tiles',q:'لها عينٌ واحدة ولا ترى بها شيئًا؟',a:'إبرة',hint:'تُستخدم مع الخيط'},
+ {type:'mcq',q:'أيّ كلمة لا تنتمي للمجموعة؟',opts:['النيل','الأمازون','إفرست','دجلة'],a:'إفرست',why:'إفرست جبل والبقية أنهار'},
+ {type:'tiles',q:'تحمله في قدمك وهو يحملك أينما ذهبت؟',a:'حذاء',hint:'تلبسه قبل الخروج'},
+ {type:'mcq',q:'والد أحمد له ثلاثة أبناء: قرش، وريال، و…؟',opts:['دينار','جنيه','أحمد','درهم'],a:'أحمد',why:'اقرأ السؤال مرة أخرى!'},
+ {type:'seq',q:'ما الرقم التالي؟',seq:'٨١ ، ٢٧ ، ٩ ، ٣ ، ؟',a:'1',opts:['0','1','2','6']},
+ {type:'tiles',q:'كلما أخذتَ منها كَبُرت واتّسعت؟',a:'حفرة',hint:'تحفرها في الأرض'},
+ {type:'emoji',q:'ما الشيء الذي تصفه الصورة؟',art:'umbrella',a:'مظلة',hint:'تحميك من المطر'},
+ {type:'tiles',q:'بيتٌ صغير بلا أبواب ولا نوافذ، فما هو؟',a:'بيضة',hint:'يخرج منها الكتكوت'},
+ {type:'seq',q:'ما الرقم التالي؟',seq:'١ ، ٤ ، ٩ ، ١٦ ، ٢٥ ، ؟',a:'36',opts:['30','32','36','49']},
+ {type:'tiles',q:'يخترق الزجاج بلطف ولا يكسره؟',a:'ضوء',hint:'يدخل من النافذة صباحًا'},
+ {type:'mcq',q:'أيّ كلمة لا تنتمي للمجموعة؟',opts:['القاهرة','الخرطوم','آسيا','الرياض'],a:'آسيا',why:'آسيا قارة والبقية عواصم'},
+ {type:'tiles',q:'ترى فيها كل شيء وليست لها عيون؟',a:'مرآة',hint:'تنظر إليها كل صباح'},
+ {type:'jigsaw',q:'أعد ترتيب القطع لتكشف الصورة الغامضة',art:'camel',a:'جمل',hint:'فكّر بما تراه في الصحراء'},
+ {type:'wordsearch',q:'يضيء السماء ليلًا ويمر بأطوار مختلفة، ابحث عن اسمه بين الحروف',a:'قمر',hint:'يكتمل بدرًا مرة كل شهر'},
+ {type:'jigsaw',q:'أعد ترتيب القطع لتكشف الصورة الغامضة',art:'honey',a:'عسل',hint:'شراب حلو تصنعه النحلة'},
+ {type:'wordsearch',q:'يتلألأ في السماء ليلًا وتُتمنى عنده الأمنيات، ابحث عن اسمه بين الحروف',a:'نجم',hint:'يظهر بعد غروب الشمس'},
+ {type:'wordsearch',q:'كتلة مياه مالحة واسعة تفصل بين اليابسة، ابحث عن اسمها بين الحروف',a:'بحر',hint:'تُبحر فيه السفن'},
+];
+const TYPE_INFO={tiles:['لغز الحروف','#D4AF37'],seq:['متتالية الأرقام','#3AA6A0'],emoji:['لغز الصور','#F0C75E'],mcq:['التحدي الذهني','#7ee6df'],jigsaw:['بازل الصورة','#C77DD2'],wordsearch:['كلمة السر المخبأة','#6FCF97']};
+const AR_LETTERS='ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
+const TIP_TEXT={
+  jigsaw:'انقر على قطعتين لتبديل مكانيهما، وأعد ترتيب الصورة كاملة للفوز.',
+  wordsearch:'اضغط الحروف بترتيبها الصحيح لتكوين الكلمة المخفية داخل الشبكة.',
+};
+
+/* فصول الخريطة: كل فصل يضم خمس مراحل بلون وأيقونة مميزة */
+const CHAPTERS=[
+ {name:'باب الحروف',color:'#D4AF37',icon:'letter'},
+ {name:'وادي الأرقام',color:'#3AA6A0',icon:'hash'},
+ {name:'مرآة الصور',color:'#D97757',icon:'image'},
+ {name:'ذكاء العرب',color:'#8E7CC3',icon:'brain'},
+ {name:'دروب الألغاز',color:'#52B788',icon:'compass'},
+ {name:'تاج الحكمة',color:'#5B9BD9',icon:'crown'},
+ {name:'غرفة الأسرار',color:'#B565A7',icon:'key'},
+];
+function chapterFor(n){return CHAPTERS[Math.min(CHAPTERS.length-1,Math.floor((n-1)/5))]}
+function hexToRgba(hex,a){
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* الإنجازات */
+const ACHIEVEMENTS=[
+ {id:'first_solve',icon:'puzzle',color:'#D4AF37',name:'الخطوة الأولى',desc:'احلل أول لغز'},
+ {id:'five_solved',icon:'target',color:'#3AA6A0',name:'صياد الألغاز',desc:'احلل 5 ألغاز'},
+ {id:'ten_solved',icon:'compass',color:'#8E7CC3',name:'خبير الحكمة',desc:'احلل 10 ألغاز'},
+ {id:'all_solved',icon:'crown',color:'#5B9BD9',name:'سيد الكنز',desc:'أكمل الألغاز الثلاثين'},
+ {id:'star_collector',icon:'star-badge',color:'#F0C75E',name:'جامع النجوم',desc:'اجمع 15 نجمة'},
+ {id:'perfect_all',icon:'gem',color:'#D97757',name:'العقل الماسي',desc:'ثلاث نجوم في كل لغز'},
+ {id:'speedster',icon:'bolt',color:'#52B788',name:'البرق',desc:'احلل لغزًا خلال 15 ثانية'},
+ {id:'no_hint_streak',icon:'brain',color:'#8E7CC3',name:'الذكاء الخالص',desc:'احلل 5 ألغاز متتالية دون تلميح'},
+ {id:'rich',icon:'coin',color:'#D4AF37',name:'كنز حقيقي',desc:'اجمع 500 عملة عبر مسيرتك'},
+ {id:'streak_7',icon:'flame',color:'#F0935E',name:'المثابر',desc:'العب 7 أيام متتالية'},
+];
+
+/* ============ الحالة ============ */
+const KEY='kanz_v1';
+let S=load();
+function load(){
+  const defaults={coins:100,unlocked:1,stars:{},achievements:{},settings:{sound:true,haptics:true},
+    noHintStreak:0,totalCoinsEarned:0,bestTime:{},lastLoginDate:null,loginStreak:0,seenTips:{}};
+  try{
+    const d=JSON.parse(localStorage.getItem(KEY));
+    if(d&&typeof d.coins==='number'){
+      return {...defaults,...d,
+        stars:d.stars||{},
+        achievements:d.achievements||{},
+        settings:{...defaults.settings,...(d.settings||{})},
+        bestTime:d.bestTime||{},
+        seenTips:d.seenTips||{}};
+    }
+  }catch(e){}
+  return defaults;
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+
+let cur=0, timerInt=null, seconds=0, hintsUsed=0, slots=[], poolMap=[];
+let jigOrder=[], jigSelected=null;
+let wsPath=[], wsGrid=[], wsSelected=[];
+
+/* ============ أصوات واهتزاز ============ */
+let AC=null;
+function snd(kind){
+  if(!S.settings.sound)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime;
+    const tone=(f,st,d,type='sine',vol=.15)=>{
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type=type;o.frequency.value=f;o.connect(g);g.connect(AC.destination);
+      g.gain.setValueAtTime(vol,t+st);g.gain.exponentialRampToValueAtTime(.001,t+st+d);
+      o.start(t+st);o.stop(t+st+d);
+    };
+    if(kind==='tap')tone(600,0,.07,'triangle',.08);
+    if(kind==='ok'){tone(523,0,.12);tone(659,.1,.12);tone(784,.2,.25)}
+    if(kind==='no'){tone(220,0,.15,'sawtooth',.08);tone(180,.12,.2,'sawtooth',.08)}
+    if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,i*.12,.3))}
+    if(kind==='coin'){tone(988,0,.08,'square',.06);tone(1319,.07,.15,'square',.06)}
+  }catch(e){}
+}
+function vibrate(pattern){
+  if(S.settings.haptics&&navigator.vibrate)navigator.vibrate(pattern);
+}
+
+/* ============ التنقل ============ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id!=='scr-game')stopTimer();
+}
+function goMap(){renderMap();showScreen('scr-map')}
+function continueGame(){startLevel(Math.min(S.unlocked,PUZZLES.length))}
+function goSettings(){renderSettings();showScreen('scr-settings')}
+function goAchievements(){renderAchievements();showScreen('scr-achievements')}
+function dismissTip(){
+  const tipEl=document.getElementById('tip-banner');
+  const type=tipEl.dataset.type;
+  if(type){S.seenTips[type]=true;save()}
+  tipEl.style.display='none';
+}
+
+/* ============ شعار النجمة الثمانية ============ */
+function renderEmblem(){
+  const g=document.getElementById('emblem-segs');g.innerHTML='';
+  const solved=Object.keys(S.stars).length,per=Math.ceil(PUZZLES.length/8);
+  for(let i=0;i<8;i++){
+    const a1=(i*45-90-20)*Math.PI/180,a2=(i*45-90+20)*Math.PI/180;
+    const r1=34,r2=88;
+    const p=`M ${Math.cos(a1)*r1} ${Math.sin(a1)*r1} L ${Math.cos((a1+a2)/2)*r2} ${Math.sin((a1+a2)/2)*r2} L ${Math.cos(a2)*r1} ${Math.sin(a2)*r1} Z`;
+    const lit=solved>=(i+1)*per - (per-1);
+    const el=document.createElementNS('http://www.w3.org/2000/svg','path');
+    el.setAttribute('d',p);
+    el.setAttribute('fill',lit?'url(#gg)':'none');
+    el.setAttribute('stroke','url(#gg)');el.setAttribute('stroke-width','2');
+    el.setAttribute('opacity',lit?'1':'.45');
+    g.appendChild(el);
+  }
+}
+
+/* ============ الرئيسية ============ */
+function renderHome(){
+  const solved=Object.keys(S.stars).length;
+  const stars=Object.values(S.stars).reduce((a,b)=>a+b,0);
+  document.getElementById('hs-solved').textContent=solved;
+  document.getElementById('hs-stars').textContent=stars;
+  document.getElementById('hs-coins').textContent=S.coins;
+  const chip=document.getElementById('streak-chip');
+  if(S.loginStreak>1){
+    chip.style.display='flex';
+    document.getElementById('streak-count').textContent=S.loginStreak;
+  }else{
+    chip.style.display='none';
+  }
+  renderEmblem();
+}
+
+/* ============ الخريطة ============ */
+function renderMap(){
+  document.getElementById('map-coins').textContent=S.coins;
+  const solved=Object.keys(S.stars).length;
+  document.getElementById('map-progress-text').textContent=`أكملت ${solved} من ${PUZZLES.length} مرحلة`;
+  document.getElementById('progress-fill').style.width=(solved/PUZZLES.length*100)+'%';
+  const grid=document.getElementById('levels-grid');grid.innerHTML='';
+  PUZZLES.forEach((p,i)=>{
+    const n=i+1;
+    const ch=chapterFor(n);
+    if(i%5===0){
+      const header=document.createElement('div');
+      header.className='chapter-header';
+      header.style.color=ch.color;
+      header.innerHTML=`<svg class="ico"><use href="#i-${ch.icon}"/></svg><span>${ch.name}</span>`;
+      grid.appendChild(header);
+    }
+    const node=document.createElement('div');
+    node.className='level-node';
+    const st=S.stars[n];
+    if(n>S.unlocked)node.classList.add('locked');
+    if(n===S.unlocked&&!st){
+      node.classList.add('current');
+      node.style.setProperty('--pulse',ch.color);
+      node.style.setProperty('--pulse-glow',hexToRgba(ch.color,.45));
+    }else{
+      node.style.borderColor=hexToRgba(ch.color,.28);
+    }
+    node.innerHTML=`<div class="type-dot" style="background:${TYPE_INFO[p.type][1]}"></div>
+      <div>${n>S.unlocked?'<svg class="ico ico-sm" style="width:15px;height:15px"><use href="#i-lock"/></svg>':n}</div>
+      <div class="mini-stars">${st?'★'.repeat(st)+'<span class="off">'+'★'.repeat(3-st)+'</span>':'&nbsp;'}</div>`;
+    node.onclick=()=>{snd('tap');startLevel(n)};
+    grid.appendChild(node);
+  });
+}
+
+/* ============ اللعب ============ */
+function startLevel(n){
+  if(n>PUZZLES.length){toast('أنهيت كل الألغاز! أنت أسطورة');goMap();return}
+  cur=n;hintsUsed=0;seconds=0;
+  const p=PUZZLES[n-1];
+  const ch=chapterFor(n);
+  document.getElementById('g-level').textContent='المرحلة '+n;
+  document.getElementById('g-coins').textContent=S.coins;
+  document.getElementById('g-type').textContent=TYPE_INFO[p.type][0];
+  document.getElementById('g-type').style.color=TYPE_INFO[p.type][1];
+  document.getElementById('g-type').style.borderColor=TYPE_INFO[p.type][1]+'66';
+  document.querySelector('.level-label').style.color=ch.color;
+  document.querySelector('#g-chapter-icon use').setAttribute('href','#i-'+ch.icon);
+  document.querySelector('.puzzle-card').style.setProperty('--accent',ch.color);
+
+  const qEl=document.getElementById('g-question'),emEl=document.getElementById('g-emoji');
+  const slotsEl=document.getElementById('g-slots'),poolEl=document.getElementById('g-pool'),optsEl=document.getElementById('g-options');
+  const jigEl=document.getElementById('g-jigsaw'),wsEl=document.getElementById('g-ws');
+  [slotsEl,poolEl,optsEl,emEl,jigEl,wsEl].forEach(el=>el.style.display='none');
+  document.getElementById('btn-clear').style.display='none';
+
+  const tipEl=document.getElementById('tip-banner');
+  if((p.type==='jigsaw'||p.type==='wordsearch')&&!S.seenTips[p.type]){
+    tipEl.dataset.type=p.type;
+    document.getElementById('tip-text').textContent=TIP_TEXT[p.type];
+    tipEl.style.display='flex';
+  }else{
+    tipEl.style.display='none';
+  }
+
+  if(p.type==='tiles'||p.type==='emoji'){
+    qEl.textContent=p.q;
+    if(p.type==='emoji'){
+      emEl.innerHTML=`<svg viewBox="0 0 120 120"><use href="#art-${p.art}"/></svg>`;
+      emEl.style.display='flex';
+    }
+    buildTiles(p.a);
+    slotsEl.style.display='flex';poolEl.style.display='flex';
+    document.getElementById('btn-clear').style.display='block';
+  }else if(p.type==='jigsaw'){
+    qEl.textContent=p.q;
+    buildJigsaw(p.art);
+    jigEl.style.display='grid';
+  }else if(p.type==='wordsearch'){
+    qEl.textContent=p.q;
+    buildWordSearch(p.a);
+    wsEl.style.display='grid';
+    document.getElementById('btn-clear').style.display='block';
+  }else{
+    qEl.innerHTML=p.q+(p.seq?`<div style="margin-top:14px;font-size:32px;color:var(--gold-bright);letter-spacing:2px;direction:rtl">${p.seq}</div>`:'');
+    buildOptions(p);
+    optsEl.style.display='grid';
+  }
+  showScreen('scr-game');
+  startTimer();
+}
+
+function buildTiles(ans){
+  const chars=[...ans];
+  slots=chars.map(()=>null);
+  const slotsEl=document.getElementById('g-slots');slotsEl.innerHTML='';slotsEl.classList.remove('shake');
+  chars.forEach((c,i)=>{
+    const s=document.createElement('div');s.className='slot';s.dataset.i=i;
+    s.onclick=()=>removeFromSlot(i);
+    slotsEl.appendChild(s);
+  });
+  // مجموعة الحروف = حروف الإجابة + حروف تمويه
+  let pool=[...chars];
+  const target=Math.max(chars.length+4,9);
+  while(pool.length<target){
+    const r=AR_LETTERS[Math.floor(Math.random()*AR_LETTERS.length)];
+    pool.push(r);
+  }
+  pool.sort(()=>Math.random()-.5);
+  poolMap=pool;
+  const poolEl=document.getElementById('g-pool');poolEl.innerHTML='';
+  pool.forEach((c,i)=>{
+    const b=document.createElement('button');b.className='letter';b.textContent=c;b.dataset.i=i;
+    b.onclick=()=>pickLetter(i);
+    poolEl.appendChild(b);
+  });
+}
+
+function pickLetter(pi){
+  const empty=slots.findIndex(s=>s===null);
+  if(empty===-1)return;
+  snd('tap');
+  slots[empty]={c:poolMap[pi],pi};
+  const slotEl=document.querySelector(`.slot[data-i="${empty}"]`);
+  slotEl.textContent=poolMap[pi];slotEl.classList.add('filled');
+  document.querySelector(`.letter[data-i="${pi}"]`).classList.add('used');
+  if(slots.every(s=>s!==null))checkTiles();
+}
+function removeFromSlot(i){
+  const s=slots[i];
+  if(!s||s.hint)return;
+  snd('tap');
+  slots[i]=null;
+  const el=document.querySelector(`.slot[data-i="${i}"]`);
+  el.textContent='';el.classList.remove('filled');
+  document.querySelector(`.letter[data-i="${s.pi}"]`).classList.remove('used');
+}
+function clearSlots(){
+  const p=PUZZLES[cur-1];
+  if(p.type==='wordsearch'){clearWs();return}
+  slots.forEach((s,i)=>{if(s&&!s.hint)removeFromSlot(i)});
+}
+function checkTiles(){
+  const p=PUZZLES[cur-1];
+  const guess=slots.map(s=>s.c).join('');
+  if(guess===p.a){win()}
+  else{
+    snd('no');vibrate([40,40,40]);
+    const el=document.getElementById('g-slots');
+    el.classList.add('shake');
+    setTimeout(()=>{el.classList.remove('shake');clearSlots()},480);
+  }
+}
+
+/* ============ بازل الصورة ============ */
+function shuffleArr(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+function buildJigsaw(art){
+  const sym=document.getElementById('art-'+art);
+  const svgMarkup=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">${sym.innerHTML}</svg>`;
+  const url='data:image/svg+xml;utf8,'+encodeURIComponent(svgMarkup);
+  do{jigOrder=shuffleArr([0,1,2,3,4,5,6,7,8])}while(jigOrder.every((v,i)=>v===i));
+  jigSelected=null;
+  const grid=document.getElementById('g-jigsaw');grid.innerHTML='';grid.classList.remove('shake');
+  jigOrder.forEach((piece,cellIdx)=>{
+    const b=document.createElement('button');
+    b.className='jigsaw-tile';b.dataset.cell=cellIdx;
+    b.style.backgroundImage=`url("${url}")`;
+    b.onclick=()=>tapJigsaw(cellIdx);
+    grid.appendChild(b);
+  });
+  refreshJigsawTiles();
+}
+function refreshJigsawTiles(){
+  const tiles=[...document.querySelectorAll('.jigsaw-tile')];
+  tiles.forEach((t,cellIdx)=>{
+    const piece=jigOrder[cellIdx];
+    const col=piece%3, row=Math.floor(piece/3);
+    t.style.backgroundPosition=`${col*50}% ${row*50}%`;
+  });
+}
+function tapJigsaw(cellIdx){
+  const tiles=[...document.querySelectorAll('.jigsaw-tile')];
+  if(jigSelected===null){
+    jigSelected=cellIdx;
+    tiles[cellIdx].classList.add('selected');
+    snd('tap');
+    return;
+  }
+  if(jigSelected===cellIdx){
+    tiles[cellIdx].classList.remove('selected');
+    jigSelected=null;
+    return;
+  }
+  [jigOrder[jigSelected],jigOrder[cellIdx]]=[jigOrder[cellIdx],jigOrder[jigSelected]];
+  tiles.forEach(t=>t.classList.remove('selected'));
+  snd('tap');vibrate(20);
+  refreshJigsawTiles();
+  jigSelected=null;
+  if(jigOrder.every((v,i)=>v===i))win();
+}
+function hintJigsaw(){
+  const c=jigOrder.findIndex((v,i)=>v!==i);
+  if(c===-1)return false;
+  const homeIdx=jigOrder.indexOf(c);
+  [jigOrder[c],jigOrder[homeIdx]]=[jigOrder[homeIdx],jigOrder[c]];
+  refreshJigsawTiles();
+  if(jigOrder.every((v,i)=>v===i))win();
+  return true;
+}
+
+/* ============ كلمة السر المخبأة ============ */
+function buildWordSearch(answer){
+  const size=6;
+  const chars=[...answer];
+  const dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+  let path=null;
+  while(!path){
+    const [dr,dc]=dirs[Math.floor(Math.random()*dirs.length)];
+    let rMin=0,rMax=size-1,cMin=0,cMax=size-1;
+    if(dr>0)rMax=size-1-dr*(chars.length-1);
+    if(dr<0)rMin=-dr*(chars.length-1);
+    if(dc>0)cMax=size-1-dc*(chars.length-1);
+    if(dc<0)cMin=-dc*(chars.length-1);
+    if(rMin>rMax||cMin>cMax)continue;
+    const r0=rMin+Math.floor(Math.random()*(rMax-rMin+1));
+    const c0=cMin+Math.floor(Math.random()*(cMax-cMin+1));
+    path=chars.map((_,i)=>(r0+dr*i)*size+(c0+dc*i));
+  }
+  wsPath=path;wsSelected=[];
+  wsGrid=Array(size*size).fill(null).map(()=>AR_LETTERS[Math.floor(Math.random()*AR_LETTERS.length)]);
+  path.forEach((cellIdx,i)=>{wsGrid[cellIdx]=chars[i]});
+  const grid=document.getElementById('g-ws');grid.innerHTML='';grid.classList.remove('shake');
+  wsGrid.forEach((ch,idx)=>{
+    const b=document.createElement('button');
+    b.className='ws-cell';b.textContent=ch;b.dataset.i=idx;
+    b.onclick=()=>tapWs(idx);
+    grid.appendChild(b);
+  });
+}
+function tapWs(idx){
+  const p=PUZZLES[cur-1];
+  const cellEl=document.querySelector(`.ws-cell[data-i="${idx}"]`);
+  if(cellEl.classList.contains('selected')||wsSelected.length>=p.a.length)return;
+  snd('tap');
+  wsSelected.push(idx);
+  cellEl.classList.add('selected');
+  if(wsSelected.length===p.a.length)checkWs();
+}
+function checkWs(){
+  const p=PUZZLES[cur-1];
+  const guess=wsSelected.map(i=>wsGrid[i]).join('');
+  if(guess===p.a){win()}
+  else{
+    snd('no');vibrate([40,40,40]);
+    const el=document.getElementById('g-ws');
+    el.classList.add('shake');
+    setTimeout(()=>{el.classList.remove('shake');clearWs()},480);
+  }
+}
+function clearWs(){
+  wsSelected.forEach(idx=>{
+    const el=document.querySelector(`.ws-cell[data-i="${idx}"]`);
+    if(!el.classList.contains('hinted'))el.classList.remove('selected');
+  });
+  wsSelected=wsSelected.filter(idx=>document.querySelector(`.ws-cell[data-i="${idx}"]`).classList.contains('hinted'));
+}
+function hintWs(){
+  const p=PUZZLES[cur-1];
+  if(wsSelected.length>=p.a.length)return false;
+  const nextIdx=wsPath[wsSelected.length];
+  document.querySelector(`.ws-cell[data-i="${nextIdx}"]`).classList.add('selected','hinted');
+  wsSelected.push(nextIdx);
+  if(wsSelected.length===p.a.length){
+    const guess=wsSelected.map(i=>wsGrid[i]).join('');
+    if(guess===p.a)win();
+  }
+  return true;
+}
+
+function buildOptions(p){
+  const optsEl=document.getElementById('g-options');optsEl.innerHTML='';
+  const shuffled=[...p.opts].sort(()=>Math.random()-.5);
+  shuffled.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=o;
+    b.onclick=()=>{
+      if(o===p.a){b.classList.add('correct');snd('ok');vibrate(30);setTimeout(win,450)}
+      else{b.classList.add('wrong');snd('no');vibrate([40,40,40]);setTimeout(()=>b.classList.remove('wrong'),500)}
+    };
+    optsEl.appendChild(b);
+  });
+}
+
+/* ============ التلميح ============ */
+function useHint(){
+  if(S.coins<20){toast('لا تكفي عملاتك! حُلّ ألغازًا لتكسب المزيد');snd('no');return}
+  const p=PUZZLES[cur-1];
+  if(p.type==='tiles'||p.type==='emoji'){
+    // اكشف أول خانة فارغة أو خاطئة بالحرف الصحيح
+    const chars=[...p.a];
+    let idx=slots.findIndex((s,i)=>!s||s.c!==chars[i]);
+    if(idx===-1)return;
+    if(slots[idx])removeFromSlot(idx);
+    // اعثر على حرف مطابق غير مستخدم في المجموعة
+    let pi=poolMap.findIndex((c,i)=>c===chars[idx]&&!document.querySelector(`.letter[data-i="${i}"]`).classList.contains('used'));
+    if(pi===-1)return;
+    slots[idx]={c:chars[idx],pi,hint:true};
+    const el=document.querySelector(`.slot[data-i="${idx}"]`);
+    el.textContent=chars[idx];el.classList.add('filled','hinted');
+    document.querySelector(`.letter[data-i="${pi}"]`).classList.add('used');
+    if(slots.every(s=>s!==null))checkTiles();
+  }else if(p.type==='jigsaw'){
+    if(!hintJigsaw())return;
+  }else if(p.type==='wordsearch'){
+    if(!hintWs())return;
+  }else{
+    // احذف خيارًا خاطئًا
+    const wrong=[...document.querySelectorAll('.opt')].filter(b=>b.textContent!==p.a&&!b.classList.contains('removed'));
+    if(wrong.length<=1){toast('لم يتبقَّ ما يُحذف!');return}
+    wrong[Math.floor(Math.random()*wrong.length)].classList.add('removed');
+  }
+  S.coins-=20;hintsUsed++;save();
+  document.getElementById('g-coins').textContent=S.coins;
+  snd('coin');
+  const hintText=p.hint||p.why;
+  if(hintsUsed===1&&hintText)toast(hintText);
+}
+
+/* ============ المؤقت ============ */
+function startTimer(){
+  stopTimer();
+  const el=document.getElementById('g-timer');
+  el.textContent='00:00';
+  timerInt=setInterval(()=>{
+    seconds++;
+    el.textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+  },1000);
+}
+function stopTimer(){if(timerInt){clearInterval(timerInt);timerInt=null}}
+
+/* ============ الإنجازات ============ */
+function checkAchievements(ctx){
+  const solved=Object.keys(S.stars).length;
+  const totalStars=Object.values(S.stars).reduce((a,b)=>a+b,0);
+  const perfect=solved>=PUZZLES.length&&PUZZLES.every((_,i)=>S.stars[i+1]===3);
+  const unlockedNow=[];
+  const tryUnlock=(id)=>{if(!S.achievements[id]){S.achievements[id]=true;unlockedNow.push(id)}};
+  if(solved>=1)tryUnlock('first_solve');
+  if(solved>=5)tryUnlock('five_solved');
+  if(solved>=10)tryUnlock('ten_solved');
+  if(solved>=PUZZLES.length)tryUnlock('all_solved');
+  if(totalStars>=15)tryUnlock('star_collector');
+  if(perfect)tryUnlock('perfect_all');
+  if(ctx&&ctx.seconds<=15)tryUnlock('speedster');
+  if(S.noHintStreak>=5)tryUnlock('no_hint_streak');
+  if(S.totalCoinsEarned>=500)tryUnlock('rich');
+  if(S.loginStreak>=7)tryUnlock('streak_7');
+  if(unlockedNow.length)save();
+  return unlockedNow;
+}
+let achQueue=[],achShowing=false;
+function queueAchievements(ids){
+  ids.forEach(id=>achQueue.push(id));
+  if(!achShowing)popAchievement();
+}
+function popAchievement(){
+  if(!achQueue.length){achShowing=false;return}
+  achShowing=true;
+  const id=achQueue.shift();
+  const a=ACHIEVEMENTS.find(x=>x.id===id);
+  if(!a){popAchievement();return}
+  const el=document.getElementById('ach-toast');
+  document.getElementById('ach-toast-ico').querySelector('use').setAttribute('href','#i-'+a.icon);
+  document.getElementById('ach-toast-ico').style.color=a.color;
+  document.getElementById('ach-toast-text').textContent=a.name;
+  el.classList.add('show');
+  snd('coin');vibrate([20,40,20]);
+  setTimeout(()=>{el.classList.remove('show');setTimeout(popAchievement,400)},2600);
+}
+function renderAchievements(){
+  const grid=document.getElementById('ach-grid');grid.innerHTML='';
+  let unlockedCount=0;
+  ACHIEVEMENTS.forEach(a=>{
+    const on=!!S.achievements[a.id];
+    if(on)unlockedCount++;
+    const card=document.createElement('div');card.className='ach-card'+(on?'':' locked');
+    const badgeBg=on?hexToRgba(a.color,.18):'rgba(245,239,224,.06)';
+    const badgeBorder=on?hexToRgba(a.color,.5):'rgba(245,239,224,.14)';
+    const iconColor=on?a.color:'var(--muted)';
+    const iconId=on?a.icon:'lock';
+    card.innerHTML=`<div class="ach-icon-badge" style="background:${badgeBg};border:1px solid ${badgeBorder}"><svg class="ico" style="color:${iconColor}"><use href="#i-${iconId}"/></svg></div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('ach-progress').textContent=unlockedCount+'/'+ACHIEVEMENTS.length;
+}
+
+/* ============ الإعدادات ============ */
+function renderSettings(){
+  document.getElementById('sw-sound').classList.toggle('on',S.settings.sound);
+  document.getElementById('sw-haptics').classList.toggle('on',S.settings.haptics);
+  document.querySelector('#ico-sound-row use').setAttribute('href',S.settings.sound?'#i-sound':'#i-mute');
+}
+function toggleSetting(key){
+  S.settings[key]=!S.settings[key];save();renderSettings();
+  if(key==='sound'&&S.settings.sound)snd('tap');
+  if(key==='haptics'&&S.settings.haptics)vibrate(20);
+}
+function resetProgress(){
+  if(!confirm('هل أنت متأكد؟ سيتم مسح كل تقدمك ونجومك وعملاتك وإنجازاتك.'))return;
+  localStorage.removeItem(KEY);
+  S=load();
+  toast('تمت إعادة الضبط');
+  renderHome();showScreen('scr-home');
+}
+
+/* ============ الدخول اليومي ============ */
+function dailyLoginCheck(){
+  const today=new Date().toISOString().slice(0,10);
+  if(S.lastLoginDate===today)return;
+  const prev=S.lastLoginDate;
+  if(prev){
+    const diffDays=Math.round((new Date(today)-new Date(prev))/86400000);
+    if(diffDays===1)S.loginStreak+=1;
+    else if(diffDays>1)S.loginStreak=1;
+  }else{
+    S.loginStreak=1;
+  }
+  S.lastLoginDate=today;
+  const bonus=Math.min(10+S.loginStreak*5,60);
+  S.coins+=bonus;S.totalCoinsEarned+=bonus;
+  save();
+  setTimeout(()=>toast(`تتابع الدخول: يوم ${S.loginStreak}! +${bonus} عملة`),700);
+  const unlocked=checkAchievements();
+  if(unlocked.length)setTimeout(()=>queueAchievements(unlocked),1400);
+}
+
+/* ============ مشاركة النتيجة ============ */
+function copyResult(){
+  const stars=S.stars[cur]||0;
+  const text=`حللت اللغز رقم ${cur} في «كنز الألغاز» وحصلت على ${'⭐'.repeat(stars)||'0 نجوم'}! 🏆`;
+  if(navigator.share){navigator.share({text}).catch(()=>{})}
+  else if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('تم نسخ النتيجة!')).catch(()=>toast('تعذّر النسخ'));
+  }else{
+    toast('غير مدعوم على هذا المتصفح');
+  }
+}
+
+/* ============ الفوز ============ */
+function win(){
+  stopTimer();snd('win');vibrate([30,50,30,50,80]);
+  const p=PUZZLES[cur-1];
+  let stars=3;
+  if(hintsUsed>=2||seconds>90)stars=1;
+  else if(hintsUsed===1||seconds>40)stars=2;
+  const prev=S.stars[cur]||0;
+  if(stars>prev)S.stars[cur]=stars;
+  const reward=10+stars*5;
+  S.coins+=reward;S.totalCoinsEarned+=reward;
+  if(hintsUsed===0)S.noHintStreak++;else S.noHintStreak=0;
+  const isBest=!S.bestTime[cur]||seconds<S.bestTime[cur];
+  if(isBest)S.bestTime[cur]=seconds;
+  if(cur>=S.unlocked)S.unlocked=Math.min(cur+1,PUZZLES.length);
+  save();
+
+  document.getElementById('win-title').textContent=['','جيد!','رائع!','عبقري!'][stars];
+  document.getElementById('win-answer').innerHTML='الإجابة: <b>'+p.a+'</b>'+(p.why?'<br><small style="color:var(--teal)">'+p.why+'</small>':'');
+  const bestEl=document.getElementById('win-best');
+  const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  if(isBest){bestEl.style.display='block';bestEl.textContent='أفضل وقت جديد: '+fmt(seconds)}
+  else{bestEl.style.display='none'}
+  const starsEl=document.getElementById('win-stars');
+  [...starsEl.children].forEach((s,i)=>s.classList.toggle('on',i<stars));
+  document.getElementById('win-coins').textContent='+'+reward+' عملة ذهبية';
+  document.getElementById('btn-next').style.display=cur<PUZZLES.length?'block':'none';
+  document.getElementById('win-modal').classList.add('show');
+  confettiBurst();
+
+  const unlocked=checkAchievements({seconds});
+  if(unlocked.length)setTimeout(()=>queueAchievements(unlocked),900);
+}
+function closeWin(){document.getElementById('win-modal').classList.remove('show')}
+function nextLevel(){closeWin();startLevel(cur+1)}
+
+/* ============ القصاصات الذهبية ============ */
+const cv=document.getElementById('confetti'),cx=cv.getContext('2d');
+let parts=[],rafId=null;
+function resize(){cv.width=innerWidth;cv.height=innerHeight}
+addEventListener('resize',resize);resize();
+function confettiBurst(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const colors=['#D4AF37','#F0C75E','#3AA6A0','#F5EFE0'];
+  for(let i=0;i<90;i++){
+    parts.push({
+      x:innerWidth/2,y:innerHeight*.35,
+      vx:(Math.random()-.5)*14,vy:Math.random()*-11-3,
+      g:.32,s:Math.random()*7+4,r:Math.random()*Math.PI,
+      vr:(Math.random()-.5)*.3,c:colors[i%4],life:110
+    });
+  }
+  if(!rafId)loop();
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.life>0&&p.y<cv.height+30);
+  parts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.r+=p.vr;p.life--;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);
+    cx.globalAlpha=Math.min(1,p.life/40);
+    cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);
+    cx.restore();
+  });
+  rafId=parts.length?requestAnimationFrame(loop):null;
+}
+
+/* ============ رسائل عابرة ============ */
+let toastT=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+dailyLoginCheck();
+renderHome();
+</script>
+</body>
+</html>

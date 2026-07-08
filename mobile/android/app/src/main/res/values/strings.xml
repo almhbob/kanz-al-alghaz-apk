@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">كنز الألغاز</string>
+    <string name="title_activity_main">كنز الألغاز</string>
+    <string name="package_name">com.hasahisawi.kanzalalghaz</string>
+    <string name="custom_url_scheme">com.hasahisawi.kanzalalghaz</string>
+</resources>

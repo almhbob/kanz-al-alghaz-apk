@@ -1,0 +1,9 @@
+{
+  "appId": "com.hasahisawi.kanzalalghaz",
+  "appName": "كنز الألغاز",
+  "webDir": "www",
+  "backgroundColor": "#0B1026",
+  "android": {
+    "backgroundColor": "#0B1026"
+  }
+}
