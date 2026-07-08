@@ -42,8 +42,10 @@ jobs:
       # refuses to build if ANDROID_HOME and ANDROID_SDK_ROOT disagree).
       - name: Ensure required Android SDK packages are installed
         run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -maxdepth 2 -name sdkmanager | sort | tail -n1)"
+          echo "using sdkmanager at: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Make gradlew executable
         run: chmod +x mobile/android/gradlew
